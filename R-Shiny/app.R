@@ -1,6 +1,4 @@
-#-----------------------------------
-# Homework 4-Yan He
-#-----------------------------------
+s
 library(shiny)
 library(shinythemes)
 library(tidyverse)

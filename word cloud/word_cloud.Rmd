@@ -1,0 +1,76 @@
+---
+author: 'Yan He'
+date: '04/24/2021'
+output:
+  # pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(stringr)
+```
+
+```{r include=FALSE}
+setwd("G:/My Drive")
+obama <- read.csv("obama_redacted_final.csv")
+clinton_like <- read.csv("redacted_2016_clinton_likes.csv")
+clinton_dislike <- read.csv("redacted_clinton_2016_dislikes.csv")
+trump_like <- read.csv("redacted_trump_2016.csv")
+trump_dislike <- read.csv("redacted_trump_2016_dislikes.csv")
+
+obama <- obama[,c('caseID', 'reasontovote')]
+```
+
+## Create a word cloud with the ANES 2016 open ended question about what respondents LIKE about Donald Trump and Hilary Clinton, what respondents DISLIKE about Donald Trump and Hilary Clinton.
+```{r message=FALSE, warning=FALSE}
+workcloud <- function(input, exclude_word=NA) {
+  df <- eval(input)
+  names(df) <- c('caseID', 'response')
+  df$response <- tolower(df$response)
+  
+  reasons <- Corpus(VectorSource(df$response))
+  #inspect(reasons)
+  
+  exclude <- c(exclude_word, stopwords('english'))
+  reasons <- tm_map(reasons, removeWords, exclude)
+  # stopwords('english')
+  reasons <- tm_map(reasons, removePunctuation)
+  
+  reasonsTDM <- TermDocumentMatrix(reasons) 
+  # inspect(reasonsTDM)
+  
+  reasonsMT <- as.matrix(reasonsTDM) 
+  
+  reasonsMT <- sort(rowSums(reasonsMT), decreasing = TRUE) 
+  # head(reasonsMT)
+  
+  reasonsDF <- data.frame(word = names(reasonsMT), freq = reasonsMT)
+  # head(reasonsDF)
+  
+  # Making the wordcloud
+  pal <- brewer.pal(6,"Dark2")
+  
+  wordcloud(reasonsDF$word, freq= reasonsDF$freq, max.words = 100, 
+            random.order = FALSE, colors = pal)
+}
+
+# Since many people said "I think" in their response, so exclude the word 'think'.
+workcloud(obama, 'think')
+workcloud(clinton_like,'think')
+workcloud(clinton_dislike,'think')
+workcloud(trump_like,'think')
+workcloud(trump_dislike,'think')
+```
+
+### 1. Compare the "like" word clouds for Trump and Obama (from lecture.) Are there similarities/differences? What conclusions do you draw?
+**ANS:**  There are some similarities. "Change" and "people" are top words in the "like" word clouds for both Omaba and Trump, and for Trump, "jobs", "make", "america" and "strong" are also among the most popular words. This indicates that slogans do have impact on people who vote for the candidates ('change' was in the slogan of Obama's election slogan, 'make america great again' was Trump's slogan).
+There are also some differences in both word clouds, the most popular word in the 'like' word cloud for Trump is "business", and not many of the most popular words for Trump are specific policy related (such as "man"). But for Obama, 'Health", 'Healthcare", "just", "issues", "ideas" and 'war' are among the popular words. This indicates that many people voted for Obama for his policy proposals, while many people vote for Trump because of his success in business and maybe his personal traits.
+
+### 2. Compare the word clouds for Donald Trump and Hilary Clinton. Comment on your findings. 
+**ANS:** Comparing the 'like' wordclouds for Trump and Clinton, we can see that the main reason for people to vote for Hilary Clinton is because of her experience (long-time politician), there are not many other popular reasons for people to vote for her (maybe another reason is that she is 'woman'). But for Trump, there are many different kinds of popular words in his 'like' word cloud, which indicates there are various reasons for people to vote for Trump, Trump was more popular. 
+
+In terms of the 'dislike' word clouds, it seems "liar","lies", 'emails', "untrustworthy", "dishonest", "criminal" are among the top words for Hilary Clinton, this indicates that people did not trust Hilary Clinton as a politician, and her email scandals really hurt in her election. On the other hand, "experience", "racist", "women" are very popular words in the 'dislike' word cloud for Trump, this indicates that people did not like him for reasons like lack of experience and some personal scandals, and many people think he was a racist, which had been the view of many people since his election and until his term was over.

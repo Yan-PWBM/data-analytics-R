@@ -1,0 +1,265 @@
+---
+author: 'Yan He'
+date: '03/08/2021'
+output:
+  pdf_document: default
+  # html_document: default
+geometry: margin=1in
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.width=6, fig.height=4) # adjust the figure margin in the output pdf
+knitr::opts_chunk$set(comment = NA) # remove the '#' in the output
+library(tidyverse) 
+library(sandwich)
+library(lmtest) 
+library(stargazer)
+library(survey)
+# https://rpubs.com/omerorsun/week3_stargazer
+```
+
+\newpage
+
+## Objective
+The objective of this project is to examine some factors that explain (or fail to explain) voters' feelings towards Donald Trump in 2016, with the voters' feelings measured by the feeling thermometer for Donald Trump (0-100) in the survey.
+
+## Data and Method
+The data for this project is from the 2016 American National Election Study. There are 1180 observations in the dataset, 1055 among them have non-missing value for the respondent variable. The variables include the basic demographics, the respondent's media consumptions, attitudes towards polics, opitions about the federal goverment and certain policies, their general ideology, as well as life satisfaction. 
+
+Some of the categorical variables of interest have many levels, we recoded those variables into fewer levels. For the marital status, we consider people who are married but widowed, divorced, seperated or with spouse absent into one category, other people would be either married with spouse present, or never married; For education, we divide all respondents into holding a degree below or above Bachelor; The respondent's race is White (non-Hispanic), Black (non-Hispanic), Other race (non-Hispanic), or Hispanic; A 3-level Media consumption level is derived based on the respondent's self-reported days per week of watching, read or listening to news on any social media--1-2 days (low), 3-5 days (medium), 6-7 days (high); We reduced the 7pt scale Liberal conservative self-placement into 4 categories--anyone reporting liberal (no matter what degree is) is considered liberal, anyone reporting conservative is considered conservative, respondents who reported "Modetate" are considered as in the middle, another group of people are those who did not think too much about the question. In terms of perceived president elect, we grouped all other people (other than Trump/Clinton) as Other. 
+
+We employed OLS regression model to study the relationship between the feeling thermometer for Trump and some potential factors, robust standard errors were introduced to take into account potential heteroscedasticity. Before the regression, we summrized the variables that are used in the analysis with some visualization and summary statistics. We also conducted some t-tests (along with confidence interval) to compare the mean difference of feeling thermometer for Trump between some groups. 
+
+## Results
+### Descriptive anaysis results
+The first scatter plot indicates that there is a slight increasing trend in Trump.Thermometer as age increases. According to the first 2 sets of Boxplots, we can see that, women have slightly lower Trump.thrermometer than men; Black people and Hispanic respondents tend to have worse feelings for trump compared to White respondents and people with other race; People with higher education and single population tend to have lower Trump.thermometer; It seems there is no huge difference in the mean Trump.thermometer among people with different interest level for campaigns (people that are very interest may have lower Trump.thermometer); there is no big difference in the mean Trump.thermometer among people with different media consumption level either. From the third set of boxplots, we can see that there is very big difference of mean Trump.thermometer among different groups for each individual variable; Basically people that are more likely to be Republican (favor fracking, more conservative, disapprove Obama, and those who think Trump would be the president-elect) tend to have better feelings for Trump. 
+
+The means by group in *Table 1* basically deliver the same inplications as the boxplots. Also, *Table 1* gives the weighted means among different groups, which show no significant difference with the unweighted mean. From *Table 1*, we can also see that slightly more women were in the sample; the majority are white people; people with Bachelor (or above) degree are about half of the people with no degree or degree below Bachelor; most respondents are married; people opposing fracking are about twice as many as people who favor fracking, there are significant amount people who are either support or oppose fracking; there are slightly more conservative-like people than liberal-like people among the respondents; in terms of Obama's approval, a little over half percent of the respondents approve Obama's job as a president; noticablly, people who think Clinton would become the president-elect are twice as many as those whose perceived president-elect is Trump.
+
+### Inferential statistical analysis results
+*Table 2* shows that the 95% confidence interval of the mean difference of Trump.thermometer between female and male is [-10.48, -0.50], the difference is significant; the 95% confidence interval of the mean difference of Trump.thermometer between people holding Bachelor above/below degree is [-20.16, -10.31], the difference is significant; and the 95% confidence interval of the mean difference of Trump.thermometer between people disapproving Obama and approving Obama is [-20.16, -10.31], which is also significant.
+
+Model 1 in *Table 3* only includes some basic demographics and respondent's attitudes towards politics and their media consumption level; Model 2 includes demographics and variables implying respondent's ideology; Compared to model 2, model 3 kept only education among all demographics, and added the interaction of Obama's approval dummy and perceived president-elect dummy.
+
+From model 1, we can see that holding other variables fixed, on average, age has no significant impact on people's reported Trump.thermometer; women have 4.81 lower Trump.thermometer than men, the difference is significant; people with degree of Bachelor or above have 17.42, significant, lower Trump.thermometer; compared to married people (spouse present), people who are never married have 7.44, significant, lower Trump.thermometer; Compared to white people, Black people have 19.28, significant, lower Trump.thermometer, other race (non-Hispanic) group have 11.21, significant, lower Trump.thermometer, and Hispanic have 10.30, significant, lower Trump.thermometer; we did not see significant difference in Trump.thermometer for people with less interest in Campaigns (compared to people who are very interested), neither for people with more media consumption (compared to people who only spend 1-2 days per week reading news on social media).
+
+In Model 2, after controlling more variables, the significance of the differene among different demographic groups disappeared except for Education, holding all other variables fixed, people with degree of Bachelor or above have 7.56, significant, lower Trump.thermometer on average (compared to 17.42 in model 1). On average, people who oppose fracking have 7.10, significant, lower Trump.thermometer than people who favor fracking; compared to people who are liberal-like, those who are in the middle have 11.41, significant, higher Trump.thermometer, who are conservative-like have 17.09, significant, higher Trump.thermometer, who did not think about the question have 10.99, significant, higher Trump.thermometer; people who disapprove Obama's job have 24.91, signifiant, higher Trump.thermometer; and people who think Trump would be the president-elect have 18.64, signifiant, higher Trump.thermometer.
+
+The coefficients in Model 3 and the significance are pretty consistent to the results in Model 2 (for those variables appear in both models), the coefficients for ObamaApproval and PerceivedPresidentElect have slightly bigger difference due to the interaction term. The coefficients of the interaction term are not significant, which means that whether the respondent approves or disapproves Obama does not influence the difference in their feelings for Trump between people who think Trump would be the president-elect and people whose perceived president-elect is Clinton, or to say, no matter who the respondent thinks would be the president-elect, it does not influence the difference in Trump.thermometer between people who disapprove and approve Obama.
+
+Overall, model 2 and 3 have higher $R^2$ than model 1 (55% vs. 12%), which indicates that model 2/3 should better fit the data.
+
+## Conclusion
+From the analysis, we can conclude that people's education and their ideology are among the main factors that explain their feelings about Trump.
+
+\newpage
+
+```{r include=FALSE}
+setwd("G:/My Drive")
+load("ANESData310.RData")
+```
+
+```{r}
+# 1) Check the attributes of the variables and process the variables
+# lapply(anes, attributes)
+# attributes(anes$V160101f)
+# nrow(anes)
+df <- anes %>%
+  select(V161267, V161002, V161268, V161270, V161310x, V160101f, V162079, V161003,
+         V161004, V161008, V161126, V161223, V161082, V161146)
+colnames(df) <- c("Age", "Gender", "MaritalStatusRaw", "EducationLevel", "RaceRaw", "Weight",
+                  "ThermometerTrump", "AttentionToPoliticsElec", "InterestInCampaign", 
+                  "DaysMediaConsumption", "SelfReportedConservative",
+                  "ApproveFracking", "OBamaApproval", "PerceivedPresidentElectRaw")
+
+# combine some levels for some categorical variables
+df$MaritalStatus <- NA
+df[df$MaritalStatusRaw==1, "MaritalStatus"] <- 0
+df[df$MaritalStatusRaw %in% c(2,3,4,5), "MaritalStatus"] <- 1
+df[df$MaritalStatusRaw==6, "MaritalStatus"] <- 2
+df$MaritalStatus = factor(df$MaritalStatus, labels=c("Married", "Single(married)", "NeverMarried"))
+
+df$Education <- NA
+df[df$EducationLevel>0 & df$EducationLevel<13, "Education"] <- 0
+df[df$EducationLevel>12 & df$EducationLevel<16, "Education"] <- 1
+df$Education = factor(df$Education, labels=c("Non-Bachelor", "BachelorAbove"))
+
+df$Race <- NA
+df[df$RaceRaw==1, "Race"] <- 0
+df[df$RaceRaw==2, "Race"] <- 1
+df[df$RaceRaw %in% c(3,4,6), "Race"] <- 2
+df[df$RaceRaw==5, "Race"] <- 3
+df$Race = factor(df$Race, labels=c("White", "Black", "Other", "Hispanic"))
+
+df$MediaConsumption <- NA
+df[df$DaysMediaConsumption %in% c(1,2), "MediaConsumption"] <- 0
+df[df$DaysMediaConsumption %in% c(3,4,5), "MediaConsumption"] <- 1
+df[df$DaysMediaConsumption %in% c(6,7), "MediaConsumption"] <- 2
+df$MediaConsumption = factor(df$MediaConsumption, labels=c("1-2d", "3-5d", "6-7d"))
+
+df$ConservativeLevel <- NA
+df[df$SelfReportedConservative %in% c(1,2,3), "ConservativeLevel"] <- 0
+df[df$SelfReportedConservative==4, "ConservativeLevel"] <- 1
+df[df$SelfReportedConservative %in% c(5,6,7), "ConservativeLevel"] <- 2
+df[df$SelfReportedConservative==99, "ConservativeLevel"] <- 3
+df$ConservativeLevel = factor(df$ConservativeLevel, labels=c("Liberal", "Middle", "Conservative", "NotThinkTooMuch"))
+
+df$PerceivedPresidentElect <- NA
+df[df$PerceivedPresidentElectRaw==1, "PerceivedPresidentElect"] <- 0
+df[df$PerceivedPresidentElectRaw==2, "PerceivedPresidentElect"] <- 1
+df[df$PerceivedPresidentElectRaw %in% c(3,4,5), "PerceivedPresidentElect"] <- 2
+df$PerceivedPresidentElect = factor(df$PerceivedPresidentElect, labels=c("Clinton", "Trump", "Other"))
+
+# recode missing values as NA
+df[df$ThermometerTrump>100, 'ThermometerTrump'] <- -9
+for (var in c("Age", "ThermometerTrump", "ApproveFracking", "OBamaApproval")) {
+  df[df[var]<0, var] = NA
+}
+
+# Label values of the categorical variables directly from the data
+for (var in c("Gender", "InterestInCampaign", "ApproveFracking", "OBamaApproval")) {
+  df[var] <- df[var]-1
+}
+
+df$Gender <- factor(df$Gender, labels=c("Male", "Female"))
+df$InterestInCampaign <- factor(df$InterestInCampaign, labels=c("VeryInterested", "SomewhatInterested", "NotMuchInterested"))
+df$ApproveFracking <- factor(df$ApproveFracking,
+                                   labels = c("Favor", "Oppose", "Middle"))
+df$OBamaApproval = factor(df$OBamaApproval, labels=c("Approve", "Disapprove"))
+
+# Drop unneeded variables and drop the respondents with missing dependent variable
+df <- df %>%
+  select(-MaritalStatusRaw,-EducationLevel, -RaceRaw, -DaysMediaConsumption,
+         -SelfReportedConservative, -PerceivedPresidentElectRaw) %>%
+  filter(!is.na(ThermometerTrump))
+```
+
+```{r}
+# Summary statistics
+# 1) plot the thermometer vs. age
+reg <- lm(ThermometerTrump~Age, data = df)
+plot(df$Age, df$ThermometerTrump,
+   xlab = 'Age of Respondent',
+   ylab = 'Trump.thermometer', 
+   main = 'Trump.thermometer vs. Age of the respondent')
+abline(reg, col='red')
+```
+
+```{r, fig.cap=c("Boxplot set 1")}
+# 2) box plot of feeling thermometer by different groups
+par(mfrow=c(2,2), tcl=-0.5, family="serif", mai=c(0.3,0.3,0.3,0.3),mar=c(2,2,2,1),oma=c(0,0,0,0))
+plot(df$Gender, df$ThermometerTrump, main="By Gender", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$Race, df$ThermometerTrump, main='By Race', 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$Education, df$ThermometerTrump, main="By Education", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$MaritalStatus, df$ThermometerTrump, main="By MaritalStatus", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+par(mfrow=c(1,1), mai=c(1.02,0.82,1.02,0.82))
+```
+
+```{r, fig.cap=c("Boxplot set 2")}
+par(mfrow=c(1,2), tcl=-0.5, family="serif", mai=c(0.3,0.3,0.3,0.3),mar=c(2,2,2,1),oma=c(0,0,0,0))
+plot(df$InterestInCampaign, df$ThermometerTrump, main="By how interest in Campaign", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$MediaConsumption, df$ThermometerTrump, main='By Media Consumption Freq.', 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+par(mfrow=c(1,1), mai=c(1.02,0.82,1.02,0.82))
+```
+
+```{r, fig.cap=c("Boxplot set 3")}
+par(mfrow=c(2,2), tcl=-0.5, family="serif", mai=c(0.3,0.3,0.3,0.3), mar=c(2,2,2,1),oma=c(0,0,0,0))
+plot(df$ApproveFracking, df$ThermometerTrump, main="By Whether Approve Fracking", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$ConservativeLevel, df$ThermometerTrump, main='By Conservative level', 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$OBamaApproval, df$ThermometerTrump, main="By Obama Approval", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+plot(df$PerceivedPresidentElect, df$ThermometerTrump, main="By perceived President-Elect", 
+     xlab='', ylab='',cex.main=1.3,cex.axis=1.1)
+par(mfrow=c(1,1), mai=c(1.02,0.82,1.02,0.82))
+```
+
+```{r}
+# 3) Some summary statistics in table
+summarystat <- function(varname) {
+  var <- sym(varname)
+  output <- df %>%
+    filter(!is.na(!!var)) %>%
+    group_by(!!var) %>%
+    summarise(Mean = round(mean(ThermometerTrump),2),
+              SD = round(sd(ThermometerTrump),2),
+              Mean.Weigted =round(weighted.mean(ThermometerTrump, Weight),2),
+              Median = round(median(ThermometerTrump),2),
+              Count = n()) %>%
+    as.data.frame() 
+  colnames(output)[1] <- 'Variable'
+  output <- output %>%
+    add_row(Variable = varname, Mean = NA, SD=NA, Mean.Weigted=NA, Median=NA, Count=NA, .before = 1)
+  return(output)
+}
+summary <- summarystat("Gender")
+for (var in c("Race", "Education", "MaritalStatus", 'ApproveFracking','ConservativeLevel','OBamaApproval', 'PerceivedPresidentElect')) {
+  summary <- summary %>%
+    bind_rows(summarystat(var))
+}
+summary <- sapply(summary, as.character) # since your values are 'factor'
+summary[is.na(summary)] <- ""
+knitr::kable(summary, caption = "Summary Statistics by different groups")
+```
+
+```{r}
+# 4) perform some tests for some of the variables of interest
+dfw <- svydesign(ids = ~0,
+                 data = df, weights = df[,'Weight'])
+numobs <- nrow(df)
+tt_gender <- svyttest(ThermometerTrump~Gender, dfw)
+tt_educ <- svyttest(ThermometerTrump~Education, dfw)
+tt_obamaapproval <- svyttest(ThermometerTrump~OBamaApproval, dfw)
+
+ttest_result <- function(tt) {
+  ci <- confint(tt, level = 0.95, df = numobs - 2) %>% as.data.frame()
+  ci["p.value"] = tt$p.value 
+  return (ci)
+}
+t_test <- ttest_result(tt_gender)
+t_test <- rbind(t_test, ttest_result(tt_educ))
+t_test <- rbind(t_test, ttest_result(tt_obamaapproval))
+knitr::kable(t_test, digits = 2, caption = "T-tests for Trump.themometer difference between groups")
+```
+
+\newpage
+```{r}
+# Regression analysis
+m1 <- lm(ThermometerTrump~Age+Gender+Education+MaritalStatus+Race+InterestInCampaign+MediaConsumption, weights = Weight, data=df)
+robust.vcov <- vcovHC(m1, type="HC1")
+robust.se1 <- sqrt(diag(robust.vcov))
+
+m2 <- lm(ThermometerTrump~Age+Gender+Education+MaritalStatus+Race+ApproveFracking+ConservativeLevel+OBamaApproval+PerceivedPresidentElect, weights = Weight, data=df)
+robust.vcov <- vcovHC(m2, type="HC1")
+robust.se2 <- sqrt(diag(robust.vcov))
+
+m3 <- lm(ThermometerTrump~Education+ApproveFracking+ConservativeLevel+OBamaApproval+PerceivedPresidentElect+PerceivedPresidentElect*OBamaApproval, weights = Weight, data=df)
+robust.vcov <- vcovHC(m3, type="HC1")
+robust.se3 <- sqrt(diag(robust.vcov))
+
+stargazer(m1, m2, m3, type="text",
+          se = list(robust.se1,robust.se2, robust.se3),
+          covariate.labels = c("Age", "Female", "BachelorAbove", "Single(Married)", "NeverMarried", "Black", "OtherRace", "Hispanic",
+                               "CampInterest:Somewhat", "CampInterest:NotMuch", "MediaConsumption:3-5d",
+                               "MediaConsumption:6-7d","Fracking:Oppose", "Fracking:Middle", "Conserv:Middle",
+                               "Conserv:conservative", "Conserv:NotThink", "DisapproveOBama", "PresidentElect:Trump",
+                               "PresidentElect:Other", "Disapprove*Trump", "Disapprove*Other", "Constant"),
+          dep.var.labels = "Feeling Themometer for Trump",
+          column.labels = c("Model1", 'Model2', "Model3"),
+          title = "Table 3: Regression Results",
+          digits = 2,
+          model.numbers = F,
+          font.size = "small", 
+          align = TRUE, 
+          no.space = TRUE,
+          single.row = TRUE)
+
+```
